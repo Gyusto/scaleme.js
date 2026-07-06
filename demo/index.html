@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>scaleme.js: demo</title>
+    <style>
+      body {
+        font: 14px system-ui, sans-serif;
+        margin: 0;
+        padding: 32px;
+        color: #111827;
+        background: #f9fafb;
+      }
+      h1 {
+        margin: 0 0 4px;
+        font-size: 20px;
+      }
+      p.lede {
+        margin: 0 0 20px;
+        color: #6b7280;
+      }
+      .nav {
+        display: flex;
+        gap: 10px;
+        margin: 0 0 28px;
+        flex-wrap: wrap;
+      }
+      .btn-primary,
+      .btn-ghost {
+        display: inline-block;
+        padding: 10px 18px;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 8px;
+      }
+      .btn-primary {
+        color: #fff;
+        background: #b0555f;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      }
+      .btn-primary:hover {
+        background: #9a4750;
+      }
+      .btn-ghost {
+        color: #2563eb;
+        background: #fff;
+        border: 1px solid #d1d5db;
+      }
+      .btn-ghost:hover {
+        background: #f3f4f6;
+      }
+      .grid {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        max-width: 1120px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
+      }
+      .card h2 {
+        margin: 0 0 2px;
+        font-size: 14px;
+        color: #374151;
+      }
+      .card p {
+        margin: 0 0 12px;
+        font-size: 12px;
+        color: #9ca3af;
+      }
+      .card code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 11px;
+        color: #6b7280;
+      }
+      .chart {
+        width: 100%;
+        height: 240px;
+      }
+      button {
+        margin-top: 12px;
+        font: inherit;
+        padding: 6px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #fff;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #f3f4f6;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>scaleme.js</h1>
+    <p class="lede">Data → scales → pixels. Canvas rendering, zero dependencies.</p>
+
+    <nav class="nav">
+      <a class="btn-primary" href="./partograph.html">📈 View the WHO partograph →</a>
+      <a class="btn-ghost" href="./docs.html">📖 Documentation</a>
+    </nav>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Line chart</h2>
+        <p><code>type: "line"</code> — the default</p>
+        <div id="line" class="chart"></div>
+        <button id="shuffle">Randomize data</button>
+      </div>
+
+      <div class="card">
+        <h2>Smooth area</h2>
+        <p><code>smooth: true, area: true, points: false</code></p>
+        <div id="area" class="chart"></div>
+      </div>
+
+      <div class="card">
+        <h2>Bar chart</h2>
+        <p><code>type: "bar"</code> — rounded corners by default</p>
+        <div id="bar" class="chart"></div>
+      </div>
+
+      <div class="card">
+        <h2>Custom bars</h2>
+        <p><code>color, barRadius: 8, barPadding: 0.8</code></p>
+        <div id="bar2" class="chart"></div>
+      </div>
+
+      <div class="card">
+        <h2>Minimal sparkline</h2>
+        <p><code>axes: false, grid: false, points: false</code></p>
+        <div id="spark" class="chart"></div>
+      </div>
+
+      <div class="card">
+        <h2>Thick smooth line</h2>
+        <p><code>lineWidth: 4, pointRadius: 5, smooth: true</code></p>
+        <div id="thick" class="chart"></div>
+      </div>
+
+      <div class="card">
+        <h2>Line with negatives</h2>
+        <p>Y domain auto-anchors at zero</p>
+        <div id="neg" class="chart"></div>
+      </div>
+
+      <div class="card">
+        <h2>Themed panel</h2>
+        <p><code>background, color, area</code></p>
+        <div id="themed" class="chart"></div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { createChart } from "../src/index.ts";
+
+      const wave = (n, amp = 15, off = 20, phase = 0) =>
+        Array.from({ length: n }, (_, i) => ({
+          x: i + 1,
+          y: Math.round(off + Math.sin(i / 1.5 + phase) * amp + Math.random() * 6),
+        }));
+
+      const bars = [
+        { x: 1, y: 8 }, { x: 2, y: 22 }, { x: 3, y: 15 },
+        { x: 4, y: 30 }, { x: 5, y: 12 }, { x: 6, y: 26 },
+      ];
+
+      const line = createChart({ type: "line", element: "#line", data: wave(12) });
+
+      createChart({
+        type: "line",
+        element: "#area",
+        color: "#0ea5e9",
+        smooth: true,
+        area: true,
+        points: false,
+        data: wave(14, 12, 24),
+      });
+
+      createChart({ type: "bar", element: "#bar", data: bars });
+
+      createChart({
+        type: "bar",
+        element: "#bar2",
+        color: "#f59e0b",
+        barRadius: 8,
+        barPadding: 0.8,
+        data: bars,
+      });
+
+      createChart({
+        type: "line",
+        element: "#spark",
+        color: "#10b981",
+        axes: false,
+        grid: false,
+        points: false,
+        smooth: true,
+        lineWidth: 2.5,
+        data: wave(24, 10, 20),
+      });
+
+      createChart({
+        type: "line",
+        element: "#thick",
+        color: "#8b5cf6",
+        lineWidth: 4,
+        pointRadius: 5,
+        smooth: true,
+        data: wave(8, 14, 26),
+      });
+
+      createChart({
+        type: "line",
+        element: "#neg",
+        color: "#db2777",
+        data: Array.from({ length: 12 }, (_, i) => ({
+          x: i + 1,
+          y: Math.round(Math.sin(i / 1.2) * 18),
+        })),
+      });
+
+      createChart({
+        type: "line",
+        element: "#themed",
+        color: "#22d3ee",
+        areaColor: "rgba(34, 211, 238, 0.18)",
+        area: true,
+        smooth: true,
+        background: "#0f172a",
+        data: wave(14, 12, 24, 1),
+      });
+
+      document
+        .getElementById("shuffle")
+        .addEventListener("click", () => line.update(wave(12)));
+    </script>
+  </body>
+</html>
